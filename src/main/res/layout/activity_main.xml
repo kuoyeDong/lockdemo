@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!--初始化-->
+            <Button
+                android:id="@+id/obinit_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="初始化" />
+            <!--添加obox-->
+            <Button
+                android:id="@+id/add_obox_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="添加obox" />
+            <!--删除obox-->
+            <Button
+                android:id="@+id/delete_obox_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="删除obox" />
+            <!--添加锁-->
+            <Button
+                android:id="@+id/add_lock_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="添加锁" />
+            <!--删除锁-->
+            <Button
+                android:id="@+id/delete_lock_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="删除锁" />
+            <!--查询锁用户-->
+            <Button
+                android:id="@+id/query_user_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="查询锁用户" />
+
+            <!--发送验证码到胁迫手机号-->
+            <Button
+                android:id="@+id/send_coercion_validatecode_user_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="发送验证码到胁迫手机号" />
+            <!--修改锁用户-->
+            <Button
+                android:id="@+id/modify_user_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="修改锁用户" />
+            <!--验证权限密码-->
+            <Button
+                android:id="@+id/validate_admin_pwd_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="验证权限密码" />
+            <!--创建权限密码-->
+            <Button
+                android:id="@+id/creat_admin_pwd_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="创建权限密码" />
+            <!--忘记权限密码-->
+            <Button
+                android:id="@+id/forget_admin_pwd_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="忘记权限密码" />
+            <!--根据推送码重置权限密码-->
+            <Button
+                android:id="@+id/reset_admin_pwd_bycode_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="根据推送码重置权限密码" />
+            <!--修改权限密码-->
+            <Button
+                android:id="@+id/modify_admin_pwd_bycode_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="修改权限密码" />
+            <!--查询临时用户-->
+            <Button
+                android:id="@+id/query_temp_user_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="查询临时用户" />
+            <!--添加临时用户-->
+            <Button
+                android:id="@+id/add_temp_user_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="添加临时用户" />
+            <!--删除临时用户-->
+            <Button
+                android:id="@+id/delete_temp_user_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="删除临时用户" />
+            <!--修改临时用户-->
+            <Button
+                android:id="@+id/modify_temp_user_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="修改临时用户" />
+            <!--发送临时密码给临时用户-->
+            <Button
+                android:id="@+id/send_code_to_temp_user_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="发送临时密码给临时用户" />
+            <!--查询推送设置列表-->
+            <Button
+                android:id="@+id/query_push_list_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="查询推送设置列表" />
+            <!--修改推送设置列表-->
+            <Button
+                android:id="@+id/modify_push_list_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="修改推送设置列表" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
