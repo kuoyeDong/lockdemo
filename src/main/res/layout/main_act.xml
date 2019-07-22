@@ -90,7 +90,7 @@
                     android:text="根据推送码重置权限密码" />
                 <!--修改权限密码-->
                 <Button
-                    android:id="@+id/modify_admin_pwd_bycode_btn"
+                    android:id="@+id/modify_admin_pwd_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="修改权限密码" />
