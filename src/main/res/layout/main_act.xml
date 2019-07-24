@@ -8,7 +8,8 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -52,54 +53,122 @@
                     android:layout_height="wrap_content"
                     android:text="查询锁用户" />
 
+                <include layout="@layout/line" />
+                <!--填写接收验证码手机号-->
+                <EditText
+                    android:id="@+id/coercion_user_phone_edt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="接收胁迫短信的手机号" />
                 <!--发送验证码到胁迫手机号-->
                 <Button
                     android:id="@+id/send_coercion_validatecode_user_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="发送验证码到胁迫手机号" />
+                <!--填写验证码-->
+                <EditText
+                    android:id="@+id/validatecode_edt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="如有胁迫密码请输入收到的验证码" />
+                <!--填写用户名-->
+                <EditText
+                    android:id="@+id/user_name_edt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="用户名称" />
                 <!--修改锁用户-->
                 <Button
                     android:id="@+id/modify_user_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="修改锁用户" />
-                <!--验证权限密码-->
-                <Button
-                    android:id="@+id/validate_admin_pwd_btn"
+                    android:text="修改第一个锁用户" />
+
+                <include layout="@layout/line" />
+                <!--输入要创建的权限密码-->
+                <EditText
+                    android:id="@+id/creat_admin_pwd_edt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="验证权限密码" />
+                    android:hint="输入要创建的权限密码" />
                 <!--创建权限密码-->
                 <Button
                     android:id="@+id/creat_admin_pwd_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="创建权限密码" />
+
+                <include layout="@layout/line" />
                 <!--忘记权限密码-->
                 <Button
                     android:id="@+id/forget_admin_pwd_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="忘记权限密码" />
+                <!--推送下去的新密码-->
+                <EditText
+                    android:id="@+id/push_admin_pwd_edt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="输入新的权限密码" />
                 <!--根据推送码重置权限密码-->
                 <Button
                     android:id="@+id/reset_admin_pwd_bycode_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="根据推送码重置权限密码" />
+                    android:text="根据推送码重置权限密码,请别忘了在锁端操作" />
+
+                <include layout="@layout/line" />
+                <!--旧密码-->
+                <EditText
+                    android:id="@+id/original_admin_pwd_edt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="输入原权限密码" />
+                <!--新密码-->
+                <EditText
+                    android:id="@+id/new_admin_pwd_edt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="输入新的权限密码" />
                 <!--修改权限密码-->
                 <Button
                     android:id="@+id/modify_admin_pwd_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="修改权限密码" />
+
+                <include layout="@layout/line" />
+                <!--输入权限密码-->
+                <EditText
+                    android:id="@+id/admin_pwd_edt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="输入权限密码" />
+                <!--验证权限密码-->
+                <Button
+                    android:id="@+id/validate_admin_pwd_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="验证权限密码" />
+
+                <include layout="@layout/line" />
+
                 <!--查询临时用户-->
                 <Button
                     android:id="@+id/query_temp_user_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="查询临时用户" />
+
+                <include layout="@layout/line" />
+                <!--添加临时用户名-->
+                <EditText
+                    android:id="@+id/new_temp_user_name_edt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="临时用户名" />
                 <!--添加临时用户-->
                 <Button
                     android:id="@+id/add_temp_user_btn"
@@ -111,7 +180,19 @@
                     android:id="@+id/delete_temp_user_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="删除临时用户" />
+                    android:text="删除第一个临时用户" />
+                <!--修改的临时用户名-->
+                <EditText
+                    android:id="@+id/modify_temp_user_name_edt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="修改的临时用户名" />
+                <!--临时用户手机号-->
+                <EditText
+                    android:id="@+id/temp_user_name_edt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="临时用户手机号" />
                 <!--修改临时用户-->
                 <Button
                     android:id="@+id/modify_temp_user_btn"
@@ -136,13 +217,37 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="修改推送设置列表" />
-                <!--修改推送设置列表-->
+                <!--查询开门记录-->
+                <Button
+                    android:id="@+id/query_lock_open_record"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="查询开门记录" />
+                <!--查询警报记录-->
+                <Button
+                    android:id="@+id/query_lock_warn_record"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="查询警报记录" />
+                <!--退出-->
                 <Button
                     android:id="@+id/finish_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="退出" />
             </LinearLayout>
+        </ScrollView>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <!--显示接收数据-->
+            <TextView
+                android:hint="接收数据展示在这里"
+                android:id="@+id/log_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </ScrollView>
     </LinearLayout>
 </layout>

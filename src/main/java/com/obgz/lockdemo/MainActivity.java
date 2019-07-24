@@ -13,6 +13,8 @@ import com.obgz.lockdemo.databinding.MainActBinding;
 import com.onbright.oblink.Obox;
 import com.onbright.oblink.cloud.ObInit;
 import com.onbright.oblink.cloud.bean.Device;
+import com.onbright.oblink.cloud.bean.LockAlarm;
+import com.onbright.oblink.cloud.bean.LockHistory;
 import com.onbright.oblink.cloud.bean.LockPush;
 import com.onbright.oblink.cloud.bean.LockTempUser;
 import com.onbright.oblink.cloud.bean.LockUser;
@@ -85,6 +87,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         });
         smartLockHotelHandler = new SmartLockHotelHandler(getSpString("lockSerId")) {
             @Override
+            public void noSerialId() {
+
+            }
+
+            @Override
             protected void lockStatusChange(LockStatusEnum lockStatusEnum) {
                 showMsg("锁状态发生变化，请查看参数枚举");
             }
@@ -140,6 +147,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         mainActBinding.queryPushListBtn.setEnabled(able);
         mainActBinding.modifyPushListBtn.setEnabled(able);
         mainActBinding.finishBtn.setEnabled(able);
+        mainActBinding.queryLockOpenRecord.setEnabled(able);
+        mainActBinding.queryLockWarnRecord.setEnabled(able);
     }
 
     @Override
@@ -176,6 +185,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     return;
                 }
                 OboxHandler oboxHandler = new OboxHandler(oboxSerId) {
+                    @Override
+                    public void noSerialId() {
+
+                    }
+
                     @Override
                     protected void oboxDeleteSuc(String oboxSerId) {
                         showMsg("成功删除obox，序列号为：" + oboxSerId);
@@ -249,10 +263,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         showMsg("noAdminPwd");
                     }
 
-                    @Override
-                    public void areadyHasAdminPwd() {
-                        showMsg("areadyHasAdminPwd");
-                    }
                 });
                 break;
             case R.id.creat_admin_pwd_btn:
@@ -260,11 +270,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     @Override
                     public void CreatAuthPwdOk() {
                         showMsg("CreatAuthPwdOk");
-                    }
-
-                    @Override
-                    public void noAdminPwd() {
-                        showMsg("noAdminPwd");
                     }
 
                     @Override
@@ -285,10 +290,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         showMsg("noAdminPwd");
                     }
 
-                    @Override
-                    public void areadyHasAdminPwd() {
-                        showMsg("areadyHasAdminPwd");
-                    }
                 });
                 break;
             case R.id.reset_admin_pwd_bycode_btn:
@@ -308,10 +309,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         showMsg("noAdminPwd");
                     }
 
-                    @Override
-                    public void areadyHasAdminPwd() {
-                        showMsg("areadyHasAdminPwd");
-                    }
                 });
                 break;
             case R.id.modify_admin_pwd_btn:
@@ -326,10 +323,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         showMsg("noAdminPwd");
                     }
 
-                    @Override
-                    public void areadyHasAdminPwd() {
-                        showMsg("areadyHasAdminPwd");
-                    }
                 });
                 break;
             case R.id.query_temp_user_btn:
@@ -346,7 +339,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 });
                 break;
             case R.id.add_temp_user_btn:
-                smartLockHotelHandler.addTemporaryUser("nickName", "2019-07-22 00:00:00", "2019-07-22 23:00:00", "3", new SmartLockHotelHandler.AddTemporaryUserLsn() {
+                LockTempUser addLockTempUser = new LockTempUser();
+                smartLockHotelHandler.addTemporaryUser(addLockTempUser, new SmartLockHotelHandler.AddTemporaryUserLsn() {
                     @Override
                     public void addTemporaryUserOk(LockTempUser lockTempUser) {
                         showMsg("addTemporaryUserOk");
@@ -391,6 +385,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         showMsg("modifyTemporaryUserOk");
                         lockTempUsers.remove(modifyLockTempUser);
                         lockTempUsers.add(0, lockTempUser);
+                    }
+
+                    @Override
+                    public void temporaryUserExpire() {
+                        showMsg("temporaryUserExpire");
                     }
 
                     @Override
@@ -439,6 +438,22 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     @Override
                     public void modifyPushOk() {
                         showMsg("modifyPushOk");
+                    }
+                });
+                break;
+            case R.id.query_lock_open_record:
+                smartLockHotelHandler.queryLockOpenRecord(new SmartLockHotelHandler.OpenRecordLsn() {
+                    @Override
+                    public void openRecordLoad(List<LockHistory> list) {
+
+                    }
+                });
+                break;
+            case R.id.query_lock_warn_record:
+                smartLockHotelHandler.queryLockWarnRecord(new SmartLockHotelHandler.WarnRecordLsn() {
+                    @Override
+                    public void warnRecordLoad(List<LockAlarm> list) {
+
                     }
                 });
                 break;
