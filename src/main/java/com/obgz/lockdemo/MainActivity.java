@@ -113,6 +113,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             @Override
             public void deleteDeviceSuc() {
                 showMsg("成功删除设备");
+                putSpString("lockSerId", null);
             }
 
             @Override
@@ -125,6 +126,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 showMsg("扫描到新设备回调，请自行保存，回调参数为扫描到的新设备实例,设备名称为：" + device.getName()
                         + "设备序列号为：" + device.getSerialId());
                 putSpString("lockSerId", device.getSerialId());
+                smartLockHotelHandler.setDeviceSerId(device.getSerialId());
             }
 
             @Override
@@ -139,11 +141,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         binding.deleteOboxBtn.setOnClickListener(this);
         binding.addLockBtn.setOnClickListener(this);
         binding.deleteLockBtn.setOnClickListener(this);
+        binding.queryLockStatusBtn.setOnClickListener(this);
         binding.queryUserBtn.setOnClickListener(this);
         binding.sendCoercionValidatecodeUserBtn.setOnClickListener(this);
         binding.modifyUserBtn.setOnClickListener(this);
         binding.creatAdminPwdBtn.setOnClickListener(this);
-        binding.forgetAdminPwdBtn.setOnClickListener(this);
         binding.resetAdminPwdBycodeBtn.setOnClickListener(this);
         binding.modifyAdminPwdBtn.setOnClickListener(this);
         binding.validateAdminPwdBtn.setOnClickListener(this);
@@ -167,11 +169,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         binding.deleteOboxBtn.setEnabled(able);
         binding.addLockBtn.setEnabled(able);
         binding.deleteLockBtn.setEnabled(able);
+        binding.queryLockStatusBtn.setEnabled(able);
         binding.queryUserBtn.setEnabled(able);
         binding.sendCoercionValidatecodeUserBtn.setEnabled(able);
         binding.modifyUserBtn.setEnabled(able);
         binding.creatAdminPwdBtn.setEnabled(able);
-        binding.forgetAdminPwdBtn.setEnabled(able);
         binding.resetAdminPwdBycodeBtn.setEnabled(able);
         binding.modifyAdminPwdBtn.setEnabled(able);
         binding.validateAdminPwdBtn.setEnabled(able);
@@ -203,13 +205,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 ConnectHandler connectHandler = new ConnectHandler(this, routePwd, new ConnectHandler.ConnectOboxLsn() {
                     @Override
                     public void error(ConnectHandler.ConnectError connectError) {
-                        showMsg("添加obox失败，请参考参数枚举查看失败原因");
+                        showMsg("添加obox失败，请参考参数枚举查看失败原因，或检查获取wifissid相关权限");
                     }
 
                     @Override
                     public void connectOboxSuc(Obox obox) {
-                        showMsg("成功添加obox，成功添加obox，请自行保存回调中的obox实例，添加设备需要用到obox的序列号,obox序列号为：" + obox.getSerialId());
-                        putSpString("oboxSerId", obox.getSerialId());
+                        showMsg("成功添加obox，成功添加obox，请自行保存回调中的obox实例，添加设备需要用到obox的序列号,obox序列号为：" + obox.getObox_serial_id());
+                        putSpString("oboxSerId", obox.getObox_serial_id());
                     }
 
                     @Override
@@ -250,6 +252,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 showMsg("删除门锁，成功回调deleteDeviceSuc");
                 smartLockHotelHandler.deleteDevice();
                 break;
+            case R.id.query_lock_status_btn:
+                showMsg("查询门锁状态，成功必然回调onStatusChange，可能回调batteryValue");
+                smartLockHotelHandler.queryLockStatus();
+                break;
             case R.id.query_user_btn:
                 smartLockHotelHandler.queryUser(new SmartLockHotelHandler.queryUserLsn() {
                     @Override
@@ -265,12 +271,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     return;
                 }
                 LockUser lockUser = lockUsers.get(0);
-                String phone = binding.coercionUserPhoneEdt.getText().toString();
-                if (TextUtils.isEmpty(phone)) {
+                String pushPhone = binding.coercionUserPhoneEdt.getText().toString();
+                if (TextUtils.isEmpty(pushPhone)) {
                     showMsg("输入胁迫电话，顺便一提，要有胁迫指纹才会发送成功");
                     return;
                 }
-                smartLockHotelHandler.sendValidateCode(lockUser, phone, new SmartLockHotelHandler.SendCodeLsn() {
+                smartLockHotelHandler.sendValidateCode(lockUser, pushPhone, new SmartLockHotelHandler.SendCodeLsn() {
                     @Override
                     public void sendCodeOk() {
                         showMsg("发送验证码成功");
@@ -296,6 +302,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         return;
                     }
                 }
+                String coercionPhone = binding.coercionUserPhoneEdt.getText().toString();
+                if (TextUtils.isEmpty(coercionPhone)) {
+                    showMsg("输入胁迫电话，顺便一提，要有胁迫指纹才会发送成功");
+                    return;
+                }
+                lockUser.setMobile(coercionPhone);
                 smartLockHotelHandler.modifyUser(lockUser, validateCode, new SmartLockHotelHandler.ModifyUserLsn() {
                     @Override
                     public void modifyUserOk() {
@@ -307,6 +319,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 String creatAdminPwd = binding.creatAdminPwdEdt.getText().toString();
                 if (TextUtils.isEmpty(creatAdminPwd)) {
                     showMsg("输入要创建的密码");
+                    return;
                 }
                 smartLockHotelHandler.createAdminPwd(creatAdminPwd, new SmartLockHotelHandler.CreatAuthPwdLsn() {
 
@@ -321,27 +334,18 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     }
                 });
                 break;
-            case R.id.forget_admin_pwd_btn:
-                smartLockHotelHandler.forgetAdminPwd(new SmartLockHotelHandler.ForgetPwdLsn() {
-                    @Override
-                    public void forgetPwdOk() {
-                        showMsg("忘记权限密码成功，可调用resetAdminPwdByCode根据推送重置权限密码");
-                    }
-
-                    @Override
-                    public void noAdminPwd() {
-                        showMsg("无权限密码，请先创建权限密码");
-                    }
-
-                });
-                break;
             case R.id.reset_admin_pwd_bycode_btn:
                 String pushAdminPwd = binding.pushAdminPwdEdt.getText().toString();
                 if (TextUtils.isEmpty(pushAdminPwd)) {
                     showMsg("请输入要重置的密码");
                     return;
                 }
-                smartLockHotelHandler.resetAdminPwdByCode(pushAdminPwd, new SmartLockHotelHandler.ResetPwdLsn() {
+                String uniqueKey = binding.uniquekeyEdt.getText().toString();
+                if (TextUtils.isEmpty(uniqueKey)) {
+                    showMsg("请输入uniquekey");
+                    return;
+                }
+                smartLockHotelHandler.resetAdminPwdByCode(pushAdminPwd, uniqueKey, new SmartLockHotelHandler.ResetPwdLsn() {
                     @Override
                     public void waitLockReset() {
                         showMsg("进入等待门锁操作状态，请操作门锁");
@@ -354,7 +358,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
                     @Override
                     public void noAdminPwd() {
-                        showMsg("无权限密码，请先创建权限密码");
+                        showMsg(getString(R.string.no_admin_pwd));
                     }
 
                 });
@@ -378,7 +382,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
                     @Override
                     public void noAdminPwd() {
-                        showMsg("无权限密码，请先创建权限密码");
+                        showMsg(getString(R.string.no_admin_pwd));
                     }
 
                 });
@@ -397,7 +401,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
                     @Override
                     public void noAdminPwd() {
-                        showMsg("无权限密码，请先创建权限密码");
+                        showMsg(getString(R.string.no_admin_pwd));
                     }
 
                 });
@@ -424,8 +428,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     return;
                 }
                 addLockTempUser.setNickName(newTempUserName);
-                addLockTempUser.setStart("2019-07-22 00:00:00");
-                addLockTempUser.setEnd("2019-07-25 00:00:00");
+                addLockTempUser.setStart("2020-07-22 00:00:00");
+                addLockTempUser.setEnd("2020-07-25 00:00:00");
                 addLockTempUser.setTimes(6);
                 smartLockHotelHandler.addTemporaryUser(addLockTempUser, new SmartLockHotelHandler.AddTemporaryUserLsn() {
                     @Override
@@ -485,7 +489,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
                     @Override
                     public void temporaryUserExpire() {
-                        showMsg("临时用户已过有效实现，不能被修改，请执行删除临时用户操作");
+                        showMsg("临时用户已过有效时限，不能被修改，请执行删除临时用户操作");
                     }
 
                     @Override
@@ -534,7 +538,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 LockPush lockPush = new LockPush();
                 /*创建一条反锁警报*/
                 lockPush.setValue(5);
-                lockPush.setEnable(1);
+                lockPush.setEnable(0);
                 lockPushes.add(lockPush);
                 String pushMobile = binding.pushMobileEdt.getText().toString();
                 smartLockHotelHandler.modifyPush(pushMobile, lockPushes, new SmartLockHotelHandler.ModifyPushLsn() {

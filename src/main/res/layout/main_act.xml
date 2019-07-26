@@ -67,6 +67,17 @@
                     layout="@layout/line"
                     android:layout_width="match_parent"
                     android:layout_height="1dp" />
+                <!--查询锁状态-->
+                <Button
+                    android:id="@+id/query_lock_status_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="查询锁状态" />
+
+                <include
+                    layout="@layout/line"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp" />
                 <!--查询锁用户-->
                 <Button
                     android:id="@+id/query_user_btn"
@@ -130,12 +141,6 @@
                     layout="@layout/line"
                     android:layout_width="match_parent"
                     android:layout_height="1dp" />
-                <!--忘记权限密码-->
-                <Button
-                    android:id="@+id/forget_admin_pwd_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="忘记权限密码" />
                 <!--推送下去的新密码-->
                 <EditText
                     android:id="@+id/push_admin_pwd_edt"
@@ -300,7 +305,7 @@
                 android:id="@+id/log_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="操作log显示在这里，ps：本demo所有的改、删都对该类别第一个对象操作" />
+                android:hint="操作log显示在这里，ps：本demo所有的改、删都对该类别第一个对象操作,请自行确认系统权限被打开，否则添加obox失败" />
         </ScrollView>
     </LinearLayout>
 </layout>

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">lockdemo</string>
+    <string name="no_admin_pwd">无权限密码，请先创建权限密码,或使用queryLockStatus查询</string>
 </resources>
