@@ -253,7 +253,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 smartLockHotelHandler.deleteDevice();
                 break;
             case R.id.query_lock_status_btn:
-                showMsg("查询门锁状态，成功必然回调onStatusChange，可能回调batteryValue");
+                showMsg("查询门锁状态，成功必然回调lockStatusChange，可能回调batteryValue");
                 smartLockHotelHandler.queryLockStatus();
                 break;
             case R.id.query_user_btn:
