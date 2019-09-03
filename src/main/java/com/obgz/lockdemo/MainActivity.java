@@ -20,7 +20,8 @@ import com.onbright.oblink.cloud.bean.LockTempUser;
 import com.onbright.oblink.cloud.bean.LockUser;
 import com.onbright.oblink.cloud.handler.ConnectHandler;
 import com.onbright.oblink.cloud.handler.OboxHandler;
-import com.onbright.oblink.cloud.handler.SmartLockHotelHandler;
+import com.onbright.oblink.cloud.handler.SmartLockHouseHandler;
+import com.onbright.oblink.cloud.handler.basehandler.RfDeviceHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     /**
      * 门锁工具类，通过此类执行门锁功能操作
      */
-    private SmartLockHotelHandler smartLockHotelHandler;
+    private SmartLockHouseHandler smartLockHouseHandler;
     /**
      * 用户列表
      */
@@ -62,7 +63,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.main_act);
         changeBtnAble(false);
-
         binding.obinitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,7 +94,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             }
         });
         addLsn();
-        smartLockHotelHandler = new SmartLockHotelHandler(getSpString("lockSerId")) {
+        smartLockHouseHandler = new SmartLockHouseHandler(getSpString("lockSerId")) {
             @Override
             public void noSerialId() {
                 showMsg("检测到在没序列号的情况下调用了必需序列号的操作，此时目标操作不会被执行，请确认有合法序列号");
@@ -106,19 +106,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             }
 
             @Override
-            protected void batteryValue(int i) {
+            public void batteryValue(int i) {
                 showMsg("当前电量值发生变化，回调参数为电量百分比,当前电量值为：" + i);
-            }
-
-            @Override
-            public void deleteDeviceSuc() {
-                showMsg("成功删除设备");
-                putSpString("lockSerId", null);
-            }
-
-            @Override
-            public void searchNewDeviceSuc() {
-                showMsg("成功开启扫描，请等待扫描时传入的时间，单位为秒");
             }
 
             @Override
@@ -126,7 +115,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 showMsg("扫描到新设备回调，请自行保存，回调参数为扫描到的新设备实例,设备名称为：" + device.getName()
                         + "设备序列号为：" + device.getSerialId());
                 putSpString("lockSerId", device.getSerialId());
-                smartLockHotelHandler.setDeviceSerId(device.getSerialId());
+                smartLockHouseHandler.setDeviceSerId(device.getSerialId());
             }
 
             @Override
@@ -202,7 +191,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     showMsg("输入路由器密码");
                     return;
                 }
-                ConnectHandler connectHandler = new ConnectHandler(this, routePwd, new ConnectHandler.ConnectOboxLsn() {
+                ConnectHandler connectHandler = new ConnectHandler(this, routePwd, new ConnectHandler.ConnectLsn() {
                     @Override
                     public void error(ConnectHandler.ConnectError connectError) {
                         showMsg("添加obox失败，请参考参数枚举查看失败原因，或检查获取wifissid相关权限");
@@ -246,18 +235,28 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             case R.id.add_lock_btn:
                 oboxSerId = getSpString("oboxSerId");
                 showMsg("OBOX序列号(门锁为OBOX下级设备)，扫描时间(十进制),开启扫描成功回调searchNewDeviceSuc，扫描到门锁回调onNewDevice");
-                smartLockHotelHandler.searchNewDevice(oboxSerId, "30");
+                smartLockHouseHandler.searchNewDevice(oboxSerId, "30", new RfDeviceHandler.SearchNewDeviceLsn() {
+                    @Override
+                    public void searchNewDeviceSuc() {
+                        showMsg("成功开启扫描，请等待扫描时传入的时间，单位为秒");
+                    }
+                });
                 break;
             case R.id.delete_lock_btn:
                 showMsg("删除门锁，成功回调deleteDeviceSuc");
-                smartLockHotelHandler.deleteDevice();
+                smartLockHouseHandler.deleteDevice(new RfDeviceHandler.DeleteDeviceLsn() {
+                    @Override
+                    public void deleteDeviceSuc() {
+
+                    }
+                });
                 break;
             case R.id.query_lock_status_btn:
                 showMsg("查询门锁状态，成功必然回调lockStatusChange，可能回调batteryValue");
-                smartLockHotelHandler.queryLockStatus();
+                smartLockHouseHandler.queryLockStatus();
                 break;
             case R.id.query_user_btn:
-                smartLockHotelHandler.queryUser(new SmartLockHotelHandler.queryUserLsn() {
+                smartLockHouseHandler.queryUser(new SmartLockHouseHandler.QueryUserLsn() {
                     @Override
                     public void userRecordLoad(List<LockUser> list) {
                         showMsg("获取用户列表成功,回调参数为用户列表，请自行保存");
@@ -276,7 +275,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     showMsg("输入胁迫电话，顺便一提，要有胁迫指纹才会发送成功");
                     return;
                 }
-                smartLockHotelHandler.sendValidateCode(lockUser, pushPhone, new SmartLockHotelHandler.SendCodeLsn() {
+                smartLockHouseHandler.sendValidateCode(lockUser, pushPhone, new SmartLockHouseHandler.SendCodeLsn() {
                     @Override
                     public void sendCodeOk() {
                         showMsg("发送验证码成功");
@@ -308,7 +307,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     return;
                 }
                 lockUser.setMobile(coercionPhone);
-                smartLockHotelHandler.modifyUser(lockUser, validateCode, new SmartLockHotelHandler.ModifyUserLsn() {
+                smartLockHouseHandler.modifyUser(lockUser, validateCode, new SmartLockHouseHandler.ModifyUserLsn() {
                     @Override
                     public void modifyUserOk() {
                         showMsg("修改用户成功");
@@ -321,7 +320,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     showMsg("输入要创建的密码");
                     return;
                 }
-                smartLockHotelHandler.createAdminPwd(creatAdminPwd, new SmartLockHotelHandler.CreatAuthPwdLsn() {
+                smartLockHouseHandler.createAdminPwd(creatAdminPwd, new SmartLockHouseHandler.CreatAuthPwdLsn() {
 
                     @Override
                     public void creatAdminPwdOk() {
@@ -345,7 +344,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     showMsg("请输入uniquekey");
                     return;
                 }
-                smartLockHotelHandler.resetAdminPwdByCode(pushAdminPwd, uniqueKey, new SmartLockHotelHandler.ResetPwdLsn() {
+                smartLockHouseHandler.resetAdminPwdByCode(pushAdminPwd, uniqueKey, new SmartLockHouseHandler.ResetPwdLsn() {
                     @Override
                     public void waitLockReset() {
                         showMsg("进入等待门锁操作状态，请操作门锁");
@@ -374,7 +373,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     showMsg("输入新密码");
                     return;
                 }
-                smartLockHotelHandler.modifyAdminPwd(orgAdminPwd, newAdminPwd, new SmartLockHotelHandler.ModifyPwdLsn() {
+                smartLockHouseHandler.modifyAdminPwd(orgAdminPwd, newAdminPwd, new SmartLockHouseHandler.ModifyPwdLsn() {
                     @Override
                     public void modifyPwdOk() {
                         showMsg("修改权限密码成功");
@@ -393,7 +392,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     showMsg("输入权限密码以验证");
                     return;
                 }
-                smartLockHotelHandler.validateAdminPwd(adminPwd, new SmartLockHotelHandler.ValidateAdminPwdLsn() {
+                smartLockHouseHandler.validateAdminPwd(adminPwd, new SmartLockHouseHandler.ValidateAdminPwdLsn() {
                     @Override
                     public void validateAdminPwdOk() {
                         showMsg("权限密码验证成功");
@@ -407,7 +406,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 });
                 break;
             case R.id.query_temp_user_btn:
-                smartLockHotelHandler.queryTemporaryUser(new SmartLockHotelHandler.QueryTemporaryUserLsn() {
+                smartLockHouseHandler.queryTemporaryUser(new SmartLockHouseHandler.QueryTemporaryUserLsn() {
                     @Override
                     public void queryTemporaryUserOk(List<LockTempUser> list) {
                         lockTempUsers = list;
@@ -431,7 +430,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 addLockTempUser.setStart("2020-07-22 00:00:00");
                 addLockTempUser.setEnd("2020-07-25 00:00:00");
                 addLockTempUser.setTimes(6);
-                smartLockHotelHandler.addTemporaryUser(addLockTempUser, new SmartLockHotelHandler.AddTemporaryUserLsn() {
+                smartLockHouseHandler.addTemporaryUser(addLockTempUser, new SmartLockHouseHandler.AddTemporaryUserLsn() {
                     @Override
                     public void addTemporaryUserOk(LockTempUser lockTempUser) {
                         showMsg("添加临时用户成功，请自取回调实例处理");
@@ -452,7 +451,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     showMsg("没有临时用户可供操作");
                     return;
                 }
-                smartLockHotelHandler.deleteTemporaryUser(lockTempUsers.get(0), new SmartLockHotelHandler.DeleteTemporaryUserLsn() {
+                smartLockHouseHandler.deleteTemporaryUser(lockTempUsers.get(0), new SmartLockHouseHandler.DeleteTemporaryUserLsn() {
                     @Override
                     public void deleteTemporaryUserOk() {
                         showMsg("删除临时用户成功");
@@ -479,7 +478,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 String tempUserMobile = binding.modifyTempUserMobileEdt.getText().toString();
                 modifyLockTempUser.setNickName(tempUserModifyName);
                 modifyLockTempUser.setMobile(tempUserMobile);
-                smartLockHotelHandler.modifyTemporaryUser(modifyLockTempUser, new SmartLockHotelHandler.ModifyTemporaryUserLsn() {
+                smartLockHouseHandler.modifyTemporaryUser(modifyLockTempUser, new SmartLockHouseHandler.ModifyTemporaryUserLsn() {
                     @Override
                     public void modifyTemporaryUserOk(LockTempUser lockTempUser) {
                         showMsg("修改临时用户成功，请自取回调实例处理");
@@ -509,7 +508,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     showMsg("该临时用户没有设定手机，请先设置手机号");
                     return;
                 }
-                smartLockHotelHandler.sendTemporaryUserPwd(sendPwdTempUser, new SmartLockHotelHandler.SendTemporaryUserPwdLsn() {
+                smartLockHouseHandler.sendTemporaryUserPwd(sendPwdTempUser, new SmartLockHouseHandler.SendTemporaryUserPwdLsn() {
                     @Override
                     public void sendTemporaryUserPwdOk() {
                         showMsg("发送密码成功");
@@ -522,7 +521,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 });
                 break;
             case R.id.query_push_list_btn:
-                smartLockHotelHandler.queryPush(new SmartLockHotelHandler.QueryPushLsn() {
+                smartLockHouseHandler.queryPush(new SmartLockHouseHandler.QueryPushLsn() {
                     @Override
                     public void queryPushOk(String s, List<LockPush> list) {
                         showMsg("查询推送配置成功，请自取回调中的电话号码，以及推送配置列表，详细的配置含义请查看源码文档,电话号码：" + s);
@@ -541,7 +540,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 lockPush.setEnable(0);
                 lockPushes.add(lockPush);
                 String pushMobile = binding.pushMobileEdt.getText().toString();
-                smartLockHotelHandler.modifyPush(pushMobile, lockPushes, new SmartLockHotelHandler.ModifyPushLsn() {
+                smartLockHouseHandler.modifyPush(pushMobile, lockPushes, new SmartLockHouseHandler.ModifyPushLsn() {
                     @Override
                     public void modifyPushOk() {
                         showMsg("修改推送配置成功");
@@ -549,7 +548,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 });
                 break;
             case R.id.query_lock_open_record:
-                smartLockHotelHandler.queryLockOpenRecord(new SmartLockHotelHandler.OpenRecordLsn() {
+                smartLockHouseHandler.queryLockOpenRecord(new SmartLockHouseHandler.OpenRecordLsn() {
                     @Override
                     public void openRecordLoad(List<LockHistory> list) {
                         StringBuilder sb = new StringBuilder();
@@ -563,7 +562,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 });
                 break;
             case R.id.query_lock_warn_record:
-                smartLockHotelHandler.queryLockWarnRecord(new SmartLockHotelHandler.WarnRecordLsn() {
+                smartLockHouseHandler.queryLockWarnRecord(new SmartLockHouseHandler.WarnRecordLsn() {
                     @Override
                     public void warnRecordLoad(List<LockAlarm> list) {
                         StringBuilder sb = new StringBuilder();
@@ -587,7 +586,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     protected void onDestroy() {
         super.onDestroy();
         obInit.destory();
-        smartLockHotelHandler.unRegist();
+        smartLockHouseHandler.unRegist();
     }
 
     /**
